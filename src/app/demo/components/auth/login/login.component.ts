@@ -1,7 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { environment } from 'src/environments/environment';
+import { jwtDecode } from 'jwt-decode'; // Corrija o import
+import { Router } from '@angular/router'; // Importe o Router
 
-declare const google: any; // Adicione esta linha
+declare const google: any;
 
 @Component({
   selector: 'app-login',
@@ -22,40 +25,53 @@ declare const google: any; // Adicione esta linha
 export class LoginComponent implements AfterViewInit {
 
   valCheck: string[] = ['remember'];
-
+  email!: string;
   password!: string;
 
-  constructor(public layoutService: LayoutService) { }
+  constructor(public layoutService: LayoutService, private router: Router) { }
 
   ngAfterViewInit(): void {
-    this.initializeGoogleSignIn();
+    this.loadGoogleScript();
+  }
+
+  loadGoogleScript() {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.onload = () => this.initializeGoogleSignIn();
+    document.head.appendChild(script);
   }
 
   initializeGoogleSignIn() {
-    const googleScriptLoaded = () => {
-      google.accounts.id.initialize({
-        client_id: '747224587241-dg0ni2i6mccdeb45jgtqr2u8jk9sqqvi.apps.googleusercontent.com',
-        callback: this.handleCredentialResponse.bind(this)
-      });
-      google.accounts.id.renderButton(
-        document.getElementById('googleSignInButton'),
-        { theme: 'outline', size: 'large' }
-      );
-    };
-
-    if ((window as any).google) {
-      googleScriptLoaded();
-    } else {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.onload = googleScriptLoaded;
-      document.head.appendChild(script);
-    }
+    google.accounts.id.initialize({
+      client_id: environment.clientIdGoogle,
+      callback: this.handleCredentialResponse.bind(this)
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('googleSignInButton'),
+      { theme: 'outline', size: 'large', width: '100%' }
+    );
   }
 
   handleCredentialResponse(response: any) {
-    console.log('response',response)
+    console.log('response', response);
     console.log('Encoded JWT ID token: ' + response.credential);
-    // Lógica adicional para lidar com o token de ID JWT
+    const userInfo = this.decodeJwtResponse(response.credential);
+    console.log('User Info:', userInfo);
+    // Lógica adicional para lidar com as informações do usuário
+  }
+
+  decodeJwtResponse(token: string): any {
+    return jwtDecode(token);
+  }
+
+  login() {
+    console.log('Login with:');
+    console.log('Email:', this.email);
+    console.log('Password:', this.password);
+    // Lógica adicional de autenticação pode ser adicionada aqui
+  }
+
+  createAccount() {
+    this.router.navigate(['/auth/create-account']);
   }
 }
