@@ -11,8 +11,8 @@ import { CascadeSelectModule } from 'primeng/cascadeselect';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table'; // Import TableModule
-import { ButtonModule } from 'primeng/button'; // Import ButtonModule
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { CheckboxModule } from 'primeng/checkbox';

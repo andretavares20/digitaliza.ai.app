@@ -1,1 +1,50 @@
-<p>novo-pedido works!</p>
+<div class="novo-pedido-container">
+    <div class="overlay" *ngIf="isDragging">
+      <div class="overlay-content">
+        LARGUE A IMAGEM AQUI
+      </div>
+    </div>
+    <div class="card">
+      <h2>Rastreie pixels para vetores em full color</h2>
+      <p>Converta suas imagens PNG e JPG para vetores SVG com facilidade e rapidez.</p>
+      <p>Totalmente automático e com o uso de IA.</p>
+  
+      <div class="upload-area"
+           (dragover)="onDragOver($event)"
+           (drop)="onDrop($event)"
+           (dragleave)="onDragLeave($event)">
+        <div class="drag-drop-area">
+          <span>ARRASTE A IMAGEM AQUI PARA COMEÇAR</span>
+        </div>
+      </div>
+  
+      <div class="upload-actions">
+        <span>ou</span>
+        <button pButton label="Escolha a imagem para vetorizar" (click)="fileInput.click()"></button>
+        <input #fileInput type="file" (change)="onFileSelected($event)" multiple style="display: none;">
+        <span>ou pressione CTRL + V</span>
+      </div>
+  
+      <ul *ngIf="newOrder.files.length">
+        <li *ngFor="let file of newOrder.files">
+          <img [src]="file.objectURL" alt="{{ file.name }}" class="thumbnail">
+          {{file.name}} - {{file.size}} bytes
+        </li>
+      </ul>
+  
+      <h5>Serviços</h5>
+      <div class="services">
+        <p-checkbox [(ngModel)]="newOrder.services.upscale" binary="true" label="Upscale"></p-checkbox>
+        <p-checkbox [(ngModel)]="newOrder.services.vetorization" binary="true" label="Vetorização"></p-checkbox>
+        <p-checkbox [(ngModel)]="newOrder.services.fineAdjustment" binary="true" label="Ajuste Fino"></p-checkbox>
+      </div>
+  
+      <div class="p-field">
+        <label for="observations">Observações</label>
+        <textarea id="observations" pInputTextarea [(ngModel)]="newOrder.observations" rows="3"></textarea>
+      </div>
+  
+      <button pButton label="Ir para o Pagamento" icon="pi pi-check" (click)="goToPayment()"></button>
+    </div>
+  </div>
+  
