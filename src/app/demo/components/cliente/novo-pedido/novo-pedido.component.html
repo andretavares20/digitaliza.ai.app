@@ -1,50 +1,51 @@
 <div class="novo-pedido-container">
-    <div class="overlay" *ngIf="isDragging">
-      <div class="overlay-content">
-        LARGUE A IMAGEM AQUI
-      </div>
-    </div>
-    <div class="card">
-      <h2>Rastreie pixels para vetores em full color</h2>
-      <p>Converta suas imagens PNG e JPG para vetores SVG com facilidade e rapidez.</p>
-      <p>Totalmente automático e com o uso de IA.</p>
-  
-      <div class="upload-area"
-           (dragover)="onDragOver($event)"
-           (drop)="onDrop($event)"
-           (dragleave)="onDragLeave($event)">
-        <div class="drag-drop-area">
-          <span>ARRASTE A IMAGEM AQUI PARA COMEÇAR</span>
-        </div>
-      </div>
-  
-      <div class="upload-actions">
-        <span>ou</span>
-        <button pButton label="Escolha a imagem para vetorizar" (click)="fileInput.click()"></button>
-        <input #fileInput type="file" (change)="onFileSelected($event)" multiple style="display: none;">
-        <span>ou pressione CTRL + V</span>
-      </div>
-  
-      <ul *ngIf="newOrder.files.length">
-        <li *ngFor="let file of newOrder.files">
-          <img [src]="file.objectURL" alt="{{ file.name }}" class="thumbnail">
-          {{file.name}} - {{file.size}} bytes
-        </li>
-      </ul>
-  
-      <h5>Serviços</h5>
-      <div class="services">
-        <p-checkbox [(ngModel)]="newOrder.services.upscale" binary="true" label="Upscale"></p-checkbox>
-        <p-checkbox [(ngModel)]="newOrder.services.vetorization" binary="true" label="Vetorização"></p-checkbox>
-        <p-checkbox [(ngModel)]="newOrder.services.fineAdjustment" binary="true" label="Ajuste Fino"></p-checkbox>
-      </div>
-  
-      <div class="p-field">
-        <label for="observations">Observações</label>
-        <textarea id="observations" pInputTextarea [(ngModel)]="newOrder.observations" rows="3"></textarea>
-      </div>
-  
-      <button pButton label="Ir para o Pagamento" icon="pi pi-check" (click)="goToPayment()"></button>
+  <div class="overlay" *ngIf="isDragging">
+    <div class="overlay-content">
+      LARGUE A IMAGEM AQUI
     </div>
   </div>
-  
+  <div class="card">
+    <h2>Rastreie pixels para vetores em full color</h2>
+    <p>Converta suas imagens PNG e JPG para vetores CorelDRAW e PDF</p>
+
+    <div class="upload-area"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event)"
+         (dragleave)="onDragLeave($event)">
+      <div class="drag-drop-area">
+        <span>ARRASTE A IMAGEM AQUI PARA COMEÇAR</span>
+      </div>
+    </div>
+
+    <div class="upload-actions">
+      <span>ou</span>
+      <button pButton label="Escolha a imagem para vetorizar" (click)="fileInput.click()"></button>
+      <input #fileInput type="file" (change)="onFileSelected($event)" multiple style="display: none;">
+      <span>ou pressione CTRL + V</span>
+    </div>
+
+    <div class="uploaded-files" *ngIf="newOrder.files.length">
+      <ul>
+        <li *ngFor="let fileObj of newOrder.files; let i = index">
+          <img [src]="fileObj.objectURL" alt="{{ fileObj.file.name }}" class="thumbnail">
+          <span>{{fileObj.file.name}} - {{fileObj.file.size}} bytes</span>
+          <button pButton icon="pi pi-times" class="remove-btn" (click)="removeFile(i)"></button>
+        </li>
+      </ul>
+    </div>
+
+    <h5>Serviços</h5>
+    <div class="services">
+      <p-checkbox [(ngModel)]="newOrder.services.upscale" binary="true" label="Melhorar imagem"></p-checkbox>
+      <p-checkbox [(ngModel)]="newOrder.services.vetorization" binary="true" label="Vetorização"></p-checkbox>
+      <p-checkbox [(ngModel)]="newOrder.services.fineAdjustment" binary="true" label="Ajuste fino"></p-checkbox>
+    </div>
+
+    <div class="p-field">
+      <label for="observations">Observações</label>
+      <textarea id="observations" pInputTextarea [(ngModel)]="newOrder.observations" rows="3"></textarea>
+    </div>
+
+    <button pButton label="Ir para o Pagamento" icon="pi pi-check" (click)="goToPayment()"></button>
+  </div>
+</div>

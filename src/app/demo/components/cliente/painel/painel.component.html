@@ -2,7 +2,6 @@
   <div class="col-12">
     <div class="card">
       <h5>Visão Geral dos Pedidos</h5>
-      <button pButton label="Novo Pedido" icon="pi pi-plus" (click)="showNewOrderDialog()" style="margin-bottom: 1rem;"></button>
       <p-table [value]="orders" [rows]="10" [paginator]="true" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr>
@@ -51,35 +50,3 @@
     </div>
   </div>
 </div>
-
-<!-- Adicionando um dialog para novo pedido -->
-<p-dialog header="Novo Pedido" [(visible)]="newOrderDialogVisible" [modal]="true" [style]="{width: '50vw'}">
-  <div class="p-fluid">
-    <div class="p-field">
-      <label for="files">Arquivos</label>
-      <p-fileUpload name="files[]" url="./upload.php" (onUpload)="onUpload($event)" [multiple]="true" accept="image/*" [maxFileSize]="1000000">
-        <ng-template pTemplate="content">
-          <ul *ngIf="newOrder.files.length">
-            <li *ngFor="let file of newOrder.files">{{file.name}} - {{file.size}} bytes</li>
-          </ul>
-        </ng-template>
-      </p-fileUpload>
-    </div>
-    <div class="p-field">
-      <label for="details">Detalhes</label>
-      <div *ngFor="let service of services">
-        <p-checkbox [(ngModel)]="service.selected" binary="true" (onChange)="calculateValue()"></p-checkbox>
-        <label>{{service.name}}</label>
-      </div>
-    </div>
-    <div class="p-field">
-      <label for="observations">Observações</label>
-      <textarea id="observations" pInputTextarea [(ngModel)]="newOrder.observations" rows="3"></textarea>
-    </div>
-    <div class="p-field">
-      <label for="value">Valor</label>
-      <input id="value" type="text" pInputText [(ngModel)]="newOrder.value" readonly>
-    </div>
-    <button pButton label="Ir para o Pagamento" icon="pi pi-check" (click)="goToPayment()"></button>
-  </div>
-</p-dialog>

@@ -27,8 +27,12 @@ export class NovoPedidoComponent {
     const files = event.target.files;
     for (let file of files) {
       const objectURL = URL.createObjectURL(file);
-      this.newOrder.files.push({ ...file, objectURL });
+      this.newOrder.files.push({ file, objectURL });
     }
+  }
+
+  removeFile(index: number) {
+    this.newOrder.files.splice(index, 1);
   }
 
   @HostListener('document:dragover', ['$event'])
@@ -51,7 +55,7 @@ export class NovoPedidoComponent {
     const files = event.dataTransfer.files;
     for (let file of files) {
       const objectURL = URL.createObjectURL(file);
-      this.newOrder.files.push({ ...file, objectURL });
+      this.newOrder.files.push({ file, objectURL });
     }
   }
 

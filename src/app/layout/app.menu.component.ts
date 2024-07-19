@@ -23,8 +23,8 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Cliente',
                 items: [
-                    { label: 'Painel', icon: 'pi pi-fw pi-home', routerLink: ['/cliente/painel'] },
                     { label: 'Novo pedido', icon: 'pi pi-fw pi-id-card', routerLink: ['/cliente/novo-pedido'] },
+                    { label: 'Painel', icon: 'pi pi-fw pi-home', routerLink: ['/cliente/painel'] },
                 ]
             },
             {
