@@ -1,0 +1,71 @@
+<div class="grid">
+    <div class="col-12">
+      <div class="card">
+        <h5>Gerenciamento de Pedidos</h5>
+        <p-table #dt [value]="pedidos" [paginator]="true" [rows]="10" [loading]="loading" [globalFilterFields]="['name', 'status', 'date', 'user', 'orderNumber']" responsiveLayout="scroll">
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+              <button pButton label="Limpar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+              <span class="p-input-icon-left mb-2">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." class="w-full" />
+              </span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="orderNumber">Número do Pedido <p-sortIcon field="orderNumber"></p-sortIcon></th>
+              <th pSortableColumn="user">Usuário <p-sortIcon field="user"></p-sortIcon></th>
+              <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+              <th pSortableColumn="date">Data <p-sortIcon field="date"></p-sortIcon></th>
+              <th>Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-pedido>
+            <tr>
+              <td>{{pedido.orderNumber}}</td>
+              <td>{{pedido.user}}</td>
+              <td>
+                <p-dropdown [options]="statuses" [(ngModel)]="pedido.status" (onChange)="changeStatus(pedido, $event.value)">
+                </p-dropdown>
+              </td>
+              <td>{{pedido.date}}</td>
+              <td>
+                <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text" (click)="viewDetails(pedido)"></button>
+                <button pButton icon="pi pi-upload" class="p-button-rounded p-button-text" (click)="fileInput.click()"></button>
+                <input #fileInput type="file" (change)="importResults($event, pedido)" multiple style="display: none;">
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">Nenhum pedido encontrado.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  
+    <p-dialog header="Detalhes do Pedido" [(visible)]="displayDetails" [modal]="true" [style]="{width: '50vw'}" [closable]="false" appendTo="body">
+      <ng-template pTemplate="content">
+        <div *ngIf="selectedPedido">
+          <h3>{{selectedPedido.name}}</h3>
+          <p>Número do Pedido: {{selectedPedido.orderNumber}}</p>
+          <p>Usuário: {{selectedPedido.user}}</p>
+          <p>Status: {{selectedPedido.status}}</p>
+          <p>Data: {{selectedPedido.date}}</p>
+          <div *ngIf="selectedPedido.results && selectedPedido.results.length">
+            <h5>Resultados Importados:</h5>
+            <ul>
+              <li *ngFor="let result of selectedPedido.results">
+                <img [src]="result.objectURL" [alt]="result.name" class="thumbnail">
+                {{result.name}}
+              </li>
+            </ul>
+          </div>
+          <button pButton label="Fechar" icon="pi pi-times" (click)="displayDetails = false"></button>
+        </div>
+      </ng-template>
+    </p-dialog>
+  </div>
+  
