@@ -11,17 +11,14 @@ import { EventService } from './demo/service/event.service';
 import { IconService } from './demo/service/icon.service';
 import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 
-@NgModule({
-    declarations: [AppComponent, NotfoundComponent],
-    imports: [AppRoutingModule, AppLayoutModule,HttpClientModule],
-    providers: [
+@NgModule({ declarations: [AppComponent, NotfoundComponent],
+    bootstrap: [AppComponent], imports: [AppRoutingModule, AppLayoutModule], providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         CountryService, CustomerService, EventService, IconService, NodeService,
-        PhotoService, ProductService,MessageService
-    ],
-    bootstrap: [AppComponent],
-})
+        PhotoService, ProductService, MessageService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule {}
