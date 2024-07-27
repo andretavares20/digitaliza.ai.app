@@ -5,21 +5,31 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class MockUserService {
-  private mockUsers = [
-    { id: 1, name: 'João Silva', email: 'joao@example.com', role: 'Administrador', status: 'Ativo' },
-    { id: 2, name: 'Maria Oliveira', email: 'maria@example.com', role: 'Usuário', status: 'Inativo' },
-    { id: 3, name: 'Pedro Sousa', email: 'pedro@example.com', role: 'Usuário', status: 'Ativo' },
+
+  private users = [
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'User', status: 'Ativo' },
+    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'Admin', status: 'Inativo' },
     // Adicione mais usuários conforme necessário
   ];
 
+  constructor() { }
+
   getUsers(): Observable<any[]> {
-    return of(this.mockUsers);
+    return of(this.users);
   }
 
-  updateUserStatus(userId: number, status: string): Observable<any> {
-    const user = this.mockUsers.find(user => user.id === userId);
+  updateUserStatus(userId: number, newStatus: string): Observable<any> {
+    const user = this.users.find(u => u.id === userId);
     if (user) {
-      user.status = status;
+      user.status = newStatus;
+    }
+    return of(user);
+  }
+
+  updateUserRole(userId: number, newRole: string): Observable<any> {
+    const user = this.users.find(u => u.id === userId);
+    if (user) {
+      user.role = newRole;
     }
     return of(user);
   }

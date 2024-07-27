@@ -8,6 +8,7 @@ import { Component, ViewChild, HostListener, ElementRef } from '@angular/core';
 export class NovoPedidoComponent {
   @ViewChild('fileInput') fileInput!: ElementRef;
   isDragging = false;
+  showPaymentButton = false;
 
   newOrder: any = {
     files: [],
@@ -72,6 +73,48 @@ export class NovoPedidoComponent {
 
   goToPayment() {
     this.calculateValue();
-    // Lógica para redirecionar para a página de pagamento
+    this.createMercadoPagoButton();
+  }
+
+  createMercadoPagoButton() {
+    this.showPaymentButton = true;
+
+    // Certifique-se de que o SDK está disponível
+    if (window['MercadoPago']) {
+      const mp = new window['MercadoPago']('YOUR_PUBLIC_KEY');
+
+      const preference = {
+        items: [
+          {
+            title: 'Serviço de Vetorização',
+            unit_price: this.newOrder.value,
+            quantity: 1,
+          }
+        ],
+        back_urls: {
+          success: 'http://www.seusite.com/success',
+          failure: 'http://www.seusite.com/failure',
+          pending: 'http://www.seusite.com/pending'
+        },
+        auto_return: 'approved',
+      };
+
+      // Simulação da criação da preferência
+      // No backend, você deve criar uma preferência e retornar o ID
+      const preferenceId = 'SUA_PREFERENCIA_ID';
+
+      mp.bricks().create("wallet", "wallet_container", {
+        initialization: {
+          preferenceId: preferenceId,
+        },
+        customization: {
+          texts: {
+            valueProp: 'smart_option',
+          },
+        },
+      });
+    } else {
+      console.error('SDK do Mercado Pago não carregado');
+    }
   }
 }

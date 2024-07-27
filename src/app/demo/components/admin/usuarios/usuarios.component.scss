@@ -1,9 +1,21 @@
-.p-button-danger {
-    background-color: #f44336;
-    border-color: #f44336;
+.p-button-rounded.p-button-warning {
+    color: var(--orange-500);
+    background-color: var(--surface-a);
+    border-color: var(--orange-500);
 }
 
-.p-button-success {
-    background-color: #4caf50;
-    border-color: #4caf50;
+.p-button-rounded.p-button-warning:hover {
+    background-color: var(--orange-100);
+    border-color: var(--orange-500);
+}
+
+.p-button-rounded.p-button-info {
+    color: var(--cyan-500);
+    background-color: var(--surface-a);
+    border-color: var(--cyan-500);
+}
+
+.p-button-rounded.p-button-info:hover {
+    background-color: var(--cyan-100);
+    border-color: var(--cyan-500);
 }

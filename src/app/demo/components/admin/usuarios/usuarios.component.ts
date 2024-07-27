@@ -48,6 +48,24 @@ export class UsuariosComponent implements OnInit {
     return usuario.status === 'Ativo' ? 'p-button-danger' : 'p-button-success';
   }
 
+  getRoleButtonIcon(usuario: any): string {
+    return usuario.role === 'Admin' ? 'pi pi-user' : 'pi pi-user-edit';
+  }
+
+  getRoleButtonClass(usuario: any): string {
+    return usuario.role === 'Admin' ? 'p-button-warning' : 'p-button-info';
+  }
+
+  changeUserRole(usuario: any) {
+    const newRole = usuario.role === 'User' ? 'Admin' : 'User';
+    this.mockUserService.updateUserRole(usuario.id, newRole).subscribe(() => {
+      usuario.role = newRole;
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Função do usuário atualizada com sucesso' });
+    }, error => {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível atualizar a função do usuário' });
+    });
+  }
+
   clear(table: any) {
     table.clear();
   }

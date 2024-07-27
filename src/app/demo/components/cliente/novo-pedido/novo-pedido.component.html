@@ -47,5 +47,8 @@
     </div>
 
     <button pButton label="Avançar" icon="pi pi-check" (click)="goToPayment()"></button>
+
+    <!-- Adicione o container para o botão do Mercado Pago -->
+    <div id="wallet_container" *ngIf="showPaymentButton"></div>
   </div>
 </div>
