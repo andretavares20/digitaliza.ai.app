@@ -37,6 +37,7 @@
 
       &:hover {
         background-color: #f9f9f9;
+        opacity: 5%;
       }
 
       .drag-drop-area {
@@ -169,3 +170,11 @@
     }
   }
 }
+
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
+

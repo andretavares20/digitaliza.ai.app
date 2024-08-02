@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
         { path: 'pedidos', data: { breadcrumb: 'Pedidos' }, loadChildren: () => import('./pedidos/pedidos.module').then(m => m.PedidosModule) },
         { path: 'usuarios', data: { breadcrumb: 'Usuarios' }, loadChildren: () => import('./usuarios/usuarios.module').then(m => m.UsuariosModule) },
         { path: 'dashboard', data: { breadcrumb: 'Dashboard' }, loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) },
+        { path: 'servicos', data: { breadcrumb: 'Servicos' }, loadChildren: () => import('./servicos/servicos.module').then(m => m.ServicosModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

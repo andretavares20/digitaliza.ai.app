@@ -1,28 +1,46 @@
-import { Component, ViewChild, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ElementRef } from '@angular/core';
+import { MockServicoService } from '../../admin/servicos/services/mock-servico.service';
+import { Router } from '@angular/router';
+import axios from 'axios';
 
 @Component({
   selector: 'app-novo-pedido',
   templateUrl: './novo-pedido.component.html',
   styleUrls: ['./novo-pedido.component.scss']
 })
-export class NovoPedidoComponent {
+export class NovoPedidoComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
   isDragging = false;
   showPaymentButton = false;
+  isLoading = true; // Variável para controlar o estado do spinner
 
+  servicos: any[] = [];
   newOrder: any = {
     files: [],
-    services: {
-      upscale: false,
-      vetorization: false,
-      fineAdjustment: false
-    },
+    services: {},
     observations: '',
     value: 0,
     orderDate: new Date(),
     deliveryDate: null,
     resultUrl: ''
   };
+
+  constructor(private servicoService: MockServicoService, private router: Router) { }
+
+  ngOnInit() {
+    this.createCheckoutButton();
+    this.loadServicos();
+    
+  }
+
+  loadServicos() {
+    this.servicoService.getServicos().subscribe(data => {
+      this.servicos = data;
+      this.servicos.forEach(servico => {
+        this.newOrder.services[servico.name] = false;
+      });
+    });
+  }
 
   onFileSelected(event: any) {
     const files = event.target.files;
@@ -61,49 +79,22 @@ export class NovoPedidoComponent {
   }
 
   calculateValue() {
-    const serviceValues = {
-      upscale: 50,
-      vetorization: 100,
-      fineAdjustment: 75
-    };
-    this.newOrder.value = Object.keys(this.newOrder.services).reduce((acc, service) => {
-      return acc + (this.newOrder.services[service] ? serviceValues[service] : 0);
+    this.newOrder.value = this.servicos.reduce((acc, servico) => {
+      return acc + (this.newOrder.services[servico.name] ? servico.price : 0);
     }, 0);
   }
 
   goToPayment() {
-    this.calculateValue();
-    this.createMercadoPagoButton();
+    this.router.navigate(['/pagamento']);
   }
 
-  createMercadoPagoButton() {
-    this.showPaymentButton = true;
+  async createCheckoutButton() {
+    try {
+      const response = await axios.get('http://localhost:3000/create_preference');
+      const preferenceId = response.data.preferenceId;
 
-    // Certifique-se de que o SDK está disponível
-    if (window['MercadoPago']) {
-      const mp = new window['MercadoPago']('YOUR_PUBLIC_KEY');
-
-      const preference = {
-        items: [
-          {
-            title: 'Serviço de Vetorização',
-            unit_price: this.newOrder.value,
-            quantity: 1,
-          }
-        ],
-        back_urls: {
-          success: 'http://www.seusite.com/success',
-          failure: 'http://www.seusite.com/failure',
-          pending: 'http://www.seusite.com/pending'
-        },
-        auto_return: 'approved',
-      };
-
-      // Simulação da criação da preferência
-      // No backend, você deve criar uma preferência e retornar o ID
-      const preferenceId = 'SUA_PREFERENCIA_ID';
-
-      mp.bricks().create("wallet", "wallet_container", {
+      const mp = new window['MercadoPago']('TEST-a45e1791-b190-4123-843b-7a4376e382bd');
+      await mp.bricks().create("wallet", "wallet_container", {
         initialization: {
           preferenceId: preferenceId,
         },
@@ -113,8 +104,11 @@ export class NovoPedidoComponent {
           },
         },
       });
-    } else {
-      console.error('SDK do Mercado Pago não carregado');
+
+      this.isLoading = false; // Desativa o spinner e o desfoque após a criação do botão
+    } catch (error) {
+      console.error('Error creating preference:', error);
+      this.isLoading = false; // Certifique-se de desativar o spinner em caso de erro
     }
   }
 }

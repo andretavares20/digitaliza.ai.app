@@ -11,20 +11,21 @@ import { CascadeSelectModule } from 'primeng/cascadeselect';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table'; 
+import { ButtonModule } from 'primeng/button'; 
 import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { CheckboxModule } from 'primeng/checkbox';
-import { NovoPedidoComponent } from './novo-pedido.component';
-import { NovoPedidoRoutingModule } from './novo-pedido-routing.module';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ServicosComponent } from './servicos.component';
+import { ServicosRoutingModule } from './servicos-routing.module';
+import { MockServicoService } from './services/mock-servico.service'; // Import MockServicoService
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    NovoPedidoRoutingModule,
+    ServicosRoutingModule,
     AutoCompleteModule,
     CalendarModule,
     ChipsModule,
@@ -39,9 +40,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     ButtonModule, 
     DialogModule,
     FileUploadModule,
-    CheckboxModule,
-    ProgressSpinnerModule
+    CheckboxModule
   ],
-  declarations: [NovoPedidoComponent]
+  declarations: [ServicosComponent],
+  providers: [MockServicoService, MessageService] // Provide MockServicoService and MessageService
 })
-export class NovoPedidoModule { }
+export class ServicosModule { }
