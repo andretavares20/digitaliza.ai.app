@@ -30,23 +30,38 @@
           <img [src]="fileObj.objectURL" alt="{{ fileObj.file.name }}" class="thumbnail">
           <span>{{fileObj.file.name}} - {{fileObj.file.size}} bytes</span>
           <button pButton icon="pi pi-times" class="remove-btn" (click)="removeFile(i)"></button>
+          <div class="services">
+            <p-checkbox *ngFor="let servico of servicos" [(ngModel)]="fileObj.services[servico.name]" binary="true" [label]="servico.name" (onChange)="calculateValue()"></p-checkbox>
+          </div>
         </li>
       </ul>
     </div>
 
-    <h5>Serviços</h5>
-    <div class="services">
-      <p-checkbox *ngFor="let servico of servicos" [(ngModel)]="newOrder.services[servico.name]" binary="true" [label]="servico.name"></p-checkbox>
-    </div>
-
     <div class="p-field">
-      <label for="observations">Observações</label>
-      <textarea id="observations" pInputTextarea [(ngModel)]="newOrder.observations" rows="3"></textarea>
+      <label for="coupon">Cupom de Desconto</label>
+      <input id="coupon" type="text" pInputText [(ngModel)]="couponCode">
+      <button pButton label="Aplicar Cupom" (click)="applyCoupon()"></button>
     </div>
 
-    <!-- <button pButton label="Avançar" icon="pi pi-check" (click)="goToPayment()"></button> -->
-    <div id="wallet_container"></div>
+    <h5>Valor Total: {{ newOrder.value | currency:'BRL' }}</h5>
+
+    <button pButton label="Avançar" icon="pi pi-check" (click)="openOrderSummary()"></button>
   </div>
 </div>
 
 <p-progressSpinner *ngIf="isLoading" [style]="{ 'width': '50px', 'height': '50px', 'position': 'fixed', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)' }" ariaLabel="loading"></p-progressSpinner>
+
+<p-dialog header="Confirmação do Pedido" [(visible)]="orderSummaryDialog" [modal]="true" [style]="{width: '450px'}">
+  <div class="p-fluid">
+    <div class="p-field">
+      <h4>Resumo do Pedido</h4>
+      <p>Valor Total: {{ newOrder.value | currency:'BRL' }}</p>
+      <div id="wallet_container"></div>
+    </div>
+  </div>
+  <p-footer>
+    <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="orderSummaryDialog = false"></p-button>
+  </p-footer>
+</p-dialog>
+
+<p-toast></p-toast>

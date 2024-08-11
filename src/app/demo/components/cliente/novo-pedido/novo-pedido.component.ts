@@ -2,43 +2,44 @@ import { Component, OnInit, ViewChild, HostListener, ElementRef } from '@angular
 import { MockServicoService } from '../../admin/servicos/services/mock-servico.service';
 import { Router } from '@angular/router';
 import axios from 'axios';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-novo-pedido',
   templateUrl: './novo-pedido.component.html',
-  styleUrls: ['./novo-pedido.component.scss']
+  styleUrls: ['./novo-pedido.component.scss'],
+  providers: [MessageService]
 })
 export class NovoPedidoComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
   isDragging = false;
-  showPaymentButton = false;
-  isLoading = true; // Variável para controlar o estado do spinner
+  isLoading = false;
+  orderSummaryDialog = false;
+  couponCode: string = ''; // Variável para armazenar o código do cupom
+  discount: number = 0; // Variável para armazenar o valor do desconto
 
   servicos: any[] = [];
   newOrder: any = {
     files: [],
     services: {},
     observations: '',
-    value: 0,
+    value: 0, // Valor total com ou sem desconto aplicado
     orderDate: new Date(),
     deliveryDate: null,
     resultUrl: ''
   };
 
-  constructor(private servicoService: MockServicoService, private router: Router) { }
+  preferenceId: string = '';
+
+  constructor(private servicoService: MockServicoService, private router: Router, private messageService: MessageService) { }
 
   ngOnInit() {
-    this.createCheckoutButton();
     this.loadServicos();
-    
   }
 
   loadServicos() {
     this.servicoService.getServicos().subscribe(data => {
       this.servicos = data;
-      this.servicos.forEach(servico => {
-        this.newOrder.services[servico.name] = false;
-      });
     });
   }
 
@@ -46,12 +47,17 @@ export class NovoPedidoComponent implements OnInit {
     const files = event.target.files;
     for (let file of files) {
       const objectURL = URL.createObjectURL(file);
-      this.newOrder.files.push({ file, objectURL });
+      this.newOrder.files.push({ file, objectURL, services: {} });
+      this.servicos.forEach(servico => {
+        this.newOrder.files[this.newOrder.files.length - 1].services[servico.name] = false;
+      });
     }
+    this.calculateValue();
   }
 
   removeFile(index: number) {
     this.newOrder.files.splice(index, 1);
+    this.calculateValue();
   }
 
   @HostListener('document:dragover', ['$event'])
@@ -74,29 +80,61 @@ export class NovoPedidoComponent implements OnInit {
     const files = event.dataTransfer.files;
     for (let file of files) {
       const objectURL = URL.createObjectURL(file);
-      this.newOrder.files.push({ file, objectURL });
+      this.newOrder.files.push({ file, objectURL, services: {} });
+      this.servicos.forEach(servico => {
+        this.newOrder.files[this.newOrder.files.length - 1].services[servico.name] = false;
+      });
     }
+    this.calculateValue();
   }
 
   calculateValue() {
-    this.newOrder.value = this.servicos.reduce((acc, servico) => {
-      return acc + (this.newOrder.services[servico.name] ? servico.price : 0);
+    // Calcula o valor total antes do desconto
+    const totalValue = this.newOrder.files.reduce((acc, file) => {
+      const fileValue = Object.keys(file.services).reduce((serviceAcc, serviceName) => {
+        const service = this.servicos.find(s => s.name === serviceName);
+        return serviceAcc + (file.services[serviceName] ? service.price : 0);
+      }, 0);
+      return acc + fileValue;
     }, 0);
+
+    // Aplica o desconto se houver
+    this.newOrder.value = totalValue - this.discount;
   }
 
-  goToPayment() {
-    this.router.navigate(['/pagamento']);
+  applyCoupon() {
+    if (this.couponCode === 'DIGITALIZEAI10') {
+      this.discount = this.newOrder.value * 0.10; // 10% de desconto
+      this.messageService.add({ severity: 'success', summary: 'Cupom aplicado', detail: '10% de desconto aplicado!' });
+    } else {
+      this.discount = 0;
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Cupom inválido.' });
+    }
+    this.calculateValue(); // Recalcula o valor total com o desconto aplicado
+  }
+
+  openOrderSummary() {
+    this.isLoading = true;
+
+    if (this.newOrder.value <= 0) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O valor total deve ser maior que zero.' });
+      this.isLoading = false;
+      return;
+    }
+
+    this.createCheckoutButton();
+    this.orderSummaryDialog = true;
   }
 
   async createCheckoutButton() {
     try {
       const response = await axios.get('http://localhost:3000/create_preference');
-      const preferenceId = response.data.preferenceId;
+      this.preferenceId = response.data.preferenceId;
 
       const mp = new window['MercadoPago']('TEST-a45e1791-b190-4123-843b-7a4376e382bd');
       await mp.bricks().create("wallet", "wallet_container", {
         initialization: {
-          preferenceId: preferenceId,
+          preferenceId: this.preferenceId,
         },
         customization: {
           texts: {
@@ -105,10 +143,28 @@ export class NovoPedidoComponent implements OnInit {
         },
       });
 
-      this.isLoading = false; // Desativa o spinner e o desfoque após a criação do botão
+      // Atualiza a preferência com o valor total atualizado
+      await this.updatePreference();
+
+      this.isLoading = false; // Desativa o spinner após a criação do botão
     } catch (error) {
       console.error('Error creating preference:', error);
       this.isLoading = false; // Certifique-se de desativar o spinner em caso de erro
     }
   }
+
+  async updatePreference() {
+    try {
+      await axios.post('http://localhost:3000/update_preference', {
+        preferenceId: this.preferenceId,
+        totalValue: this.newOrder.value
+      });
+
+      // A tela de pagamento será aberta automaticamente após o clique no botão do MercadoPago.
+    } catch (error) {
+      console.error('Error updating preference:', error);
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível atualizar a preferência.' });
+    }
+  }
 }
+

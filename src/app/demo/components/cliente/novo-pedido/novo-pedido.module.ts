@@ -19,6 +19,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { NovoPedidoComponent } from './novo-pedido.component';
 import { NovoPedidoRoutingModule } from './novo-pedido-routing.module';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   imports: [
@@ -40,7 +41,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     DialogModule,
     FileUploadModule,
     CheckboxModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    ToastModule
   ],
   declarations: [NovoPedidoComponent]
 })
