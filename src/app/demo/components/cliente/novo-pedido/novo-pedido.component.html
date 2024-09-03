@@ -1,4 +1,4 @@
-<div class="novo-pedido-container" [class.blurred]="isLoading">
+<div class="novo-pedido-container" >
   <div class="overlay" *ngIf="isDragging">
     <div class="overlay-content">
       LARGUE A IMAGEM AQUI
@@ -39,20 +39,27 @@
 
     <div class="p-field">
       <label for="coupon">Cupom de Desconto</label>
-      <input id="coupon" type="text" pInputText [(ngModel)]="couponCode">
-      <button pButton label="Aplicar Cupom" (click)="applyCoupon()"></button>
+      <input id="coupon" type="text" pInputText [(ngModel)]="couponCode" [disabled]="couponApplied">
+      <button pButton label="Aplicar Cupom" (click)="applyCoupon()" [disabled]="couponApplied || newOrder.value <= 0"></button>
     </div>
-
+    
+    <div *ngIf="couponApplied">
+      <p>Cupom aplicado: <strong>{{ couponCode }}</strong></p>
+      <p>Valor original: <span style="text-decoration: line-through;">{{ originalValue | currency:'BRL' }}</span></p>
+      <p>Valor com desconto: <strong>{{ newOrder.value | currency:'BRL' }}</strong></p>
+    </div>
+    
     <h5>Valor Total: {{ newOrder.value | currency:'BRL' }}</h5>
 
     <button pButton label="Avançar" icon="pi pi-check" (click)="openOrderSummary()"></button>
   </div>
 </div>
 
-<p-progressSpinner *ngIf="isLoading" [style]="{ 'width': '50px', 'height': '50px', 'position': 'fixed', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)' }" ariaLabel="loading"></p-progressSpinner>
 
-<p-dialog header="Confirmação do Pedido" [(visible)]="orderSummaryDialog" [modal]="true" [style]="{width: '450px'}">
-  <div class="p-fluid">
+<p-dialog  header="Confirmação do Pedido" [(visible)]="orderSummaryDialog" [modal]="true" [style]="{width: '450px'}">
+  <p-progressSpinner *ngIf="isLoading" [style]="{ 'width': '50px', 'height': '50px', 'position': 'fixed', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)' }" ariaLabel="loading"></p-progressSpinner>
+
+  <div [class.blurred]="isLoading" class="p-fluid" >
     <div class="p-field">
       <h4>Resumo do Pedido</h4>
       <p>Valor Total: {{ newOrder.value | currency:'BRL' }}</p>

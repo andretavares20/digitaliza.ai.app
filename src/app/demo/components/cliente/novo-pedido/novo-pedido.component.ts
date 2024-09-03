@@ -17,6 +17,8 @@ export class NovoPedidoComponent implements OnInit {
   orderSummaryDialog = false;
   couponCode: string = ''; // Variável para armazenar o código do cupom
   discount: number = 0; // Variável para armazenar o valor do desconto
+  couponApplied = false; // Variável para verificar se o cupom foi aplicado
+  originalValue: number = 0; // Variável para armazenar o valor antes do desconto
 
   servicos: any[] = [];
   newOrder: any = {
@@ -98,13 +100,29 @@ export class NovoPedidoComponent implements OnInit {
       return acc + fileValue;
     }, 0);
 
+    // Salva o valor original se o cupom ainda não foi aplicado
+    if (!this.couponApplied) {
+      this.originalValue = totalValue;
+    }
+
     // Aplica o desconto se houver
     this.newOrder.value = totalValue - this.discount;
   }
 
   applyCoupon() {
+    if (this.newOrder.value <= 0) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O valor total deve ser maior que zero para aplicar um cupom.' });
+      return;
+    }
+
+    if (this.couponApplied) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Cupom já aplicado.' });
+      return;
+    }
+
     if (this.couponCode === 'DIGITALIZEAI10') {
-      this.discount = this.newOrder.value * 0.10; // 10% de desconto
+      this.discount = this.originalValue * 0.10; // 10% de desconto
+      this.couponApplied = true; // Marca que o cupom foi aplicado
       this.messageService.add({ severity: 'success', summary: 'Cupom aplicado', detail: '10% de desconto aplicado!' });
     } else {
       this.discount = 0;
@@ -128,7 +146,7 @@ export class NovoPedidoComponent implements OnInit {
 
   async createCheckoutButton() {
     try {
-      const response = await axios.get('http://localhost:3000/create_preference');
+      const response = await axios.get('http://localhost:3000/mercadopago/create_preference');
       this.preferenceId = response.data.preferenceId;
 
       const mp = new window['MercadoPago']('TEST-a45e1791-b190-4123-843b-7a4376e382bd');
@@ -155,7 +173,7 @@ export class NovoPedidoComponent implements OnInit {
 
   async updatePreference() {
     try {
-      await axios.post('http://localhost:3000/update_preference', {
+      await axios.post('http://localhost:3000/mercadopago/update_preference', {
         preferenceId: this.preferenceId,
         totalValue: this.newOrder.value
       });
@@ -167,4 +185,3 @@ export class NovoPedidoComponent implements OnInit {
     }
   }
 }
-

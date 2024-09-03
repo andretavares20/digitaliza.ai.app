@@ -1,8 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 import { environment } from 'src/environments/environment';
-import { jwtDecode } from 'jwt-decode'; // Corrija o import
-import { Router } from '@angular/router'; // Importe o Router
 
 declare const google: any;
 
@@ -28,7 +28,11 @@ export class LoginComponent implements AfterViewInit {
   email!: string;
   password!: string;
 
-  constructor(public layoutService: LayoutService, private router: Router) { }
+  constructor(
+    public layoutService: LayoutService, 
+    private router: Router,
+    private authService: AuthService  // Injeção do serviço de autenticação
+  ) {}
 
   ngAfterViewInit(): void {
     this.loadGoogleScript();
@@ -58,18 +62,33 @@ export class LoginComponent implements AfterViewInit {
     const userInfo = this.decodeJwtResponse(response.credential);
     console.log('User Info:', userInfo);
     // Lógica adicional para lidar com as informações do usuário
+    this.authService.setSession(response.credential);  // Armazena o token de sessão
+    this.router.navigate(['/']);
   }
 
   decodeJwtResponse(token: string): any {
-    return jwtDecode(token);
+    return JSON.parse(atob(token.split('.')[1]));
   }
 
   login() {
-    console.log('Login with:');
-    console.log('Email:', this.email);
-    console.log('Password:', this.password);
-    // Lógica adicional de autenticação pode ser adicionada aqui
+    const credentials = {
+      email: this.email,
+      password: this.password
+    };
+  
+    this.authService.login(credentials).subscribe(
+      (response) => {
+        console.log('Login successful', response);
+        this.authService.saveToken(response);  // Armazena o token recebido
+        this.router.navigate(['/']);
+      },
+      (error) => {
+        console.error('Login failed', error);
+        // Exibir mensagem de erro ao usuário
+      }
+    );
   }
+  
 
   createAccount() {
     this.router.navigate(['/auth/create-account']);
