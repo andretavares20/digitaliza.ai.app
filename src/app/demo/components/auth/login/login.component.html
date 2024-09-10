@@ -8,7 +8,8 @@
                     <span class="text-600 font-medium">Faça login para continuar</span>
                 </div>
 
-                <div>
+                <!-- Adicionando o evento (keydown.enter) para chamar o método login() ao apertar Enter -->
+                <div (keydown.enter)="login()">
                     <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
                     <input id="email1" type="text" placeholder="Endereço de email" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem" [(ngModel)]="email">
 
@@ -22,6 +23,7 @@
                         </div>
                         <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Esqueceu sua senha?</a>
                     </div>
+
                     <button pButton pRipple label="Entrar" class="w-full p-3 text-xl" (click)="login()"></button>
                     <button pButton pRipple label="Criar Conta" class="w-full p-3 text-xl mt-2" (click)="createAccount()"></button>
 
@@ -36,3 +38,4 @@
         </div>
     </div>
 </div>
+<p-toast></p-toast>

@@ -3,6 +3,7 @@ import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { environment } from 'src/environments/environment';
+import { MessageService } from 'primeng/api';
 
 declare const google: any;
 
@@ -29,9 +30,10 @@ export class LoginComponent implements AfterViewInit {
   password!: string;
 
   constructor(
-    public layoutService: LayoutService, 
+    public layoutService: LayoutService,
     private router: Router,
-    private authService: AuthService  // Injeção do serviço de autenticação
+    private authService: AuthService,
+    private messageService: MessageService  // Serviço para mostrar mensagens
   ) {}
 
   ngAfterViewInit(): void {
@@ -57,13 +59,9 @@ export class LoginComponent implements AfterViewInit {
   }
 
   handleCredentialResponse(response: any) {
-    console.log('response', response);
-    console.log('Encoded JWT ID token: ' + response.credential);
     const userInfo = this.decodeJwtResponse(response.credential);
-    console.log('User Info:', userInfo);
-    // Lógica adicional para lidar com as informações do usuário
-    this.authService.setSession(response.credential);  // Armazena o token de sessão
-    this.router.navigate(['/']);
+    this.authService.setSession(response.credential);  // Armazena o token JWT do Google
+    this.authService.handleRoleRedirect();  // Redireciona com base no papel
   }
 
   decodeJwtResponse(token: string): any {
@@ -78,17 +76,23 @@ export class LoginComponent implements AfterViewInit {
   
     this.authService.login(credentials).subscribe(
       (response) => {
-        console.log('Login successful', response);
-        this.authService.saveToken(response);  // Armazena o token recebido
-        this.router.navigate(['/']);
+        this.authService.saveToken(response);  // Armazena o token JWT retornado pela API
+        this.messageService.add({severity: 'success', summary: 'Sucesso', detail: 'Login realizado com sucesso!'});
+
+        // Redireciona com base no papel
+        setTimeout(() => {
+          this.authService.handleRoleRedirect();
+        }, 1500);  // Atraso para exibir a mensagem de sucesso antes de redirecionar
       },
       (error) => {
-        console.error('Login failed', error);
-        // Exibir mensagem de erro ao usuário
+        if (error.status === 403) {
+          this.messageService.add({severity: 'error', summary: 'Erro', detail: 'Email ou senha inválidos.'});
+        } else {
+          this.messageService.add({severity: 'error', summary: 'Erro', detail: 'Erro ao fazer login, tente novamente.'});
+        }
       }
     );
   }
-  
 
   createAccount() {
     this.router.navigate(['/auth/create-account']);
