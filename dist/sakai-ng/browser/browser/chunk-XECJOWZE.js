@@ -1,1 +1,0 @@
-import{H as o,K as r,Kb as s}from"./chunk-EOM5JP26.js";var m=(()=>{let t=class t{constructor(e){this.http=e}getImages(){return this.http.get("assets/demo/data/photos.json").toPromise().then(e=>e.data).then(e=>e)}};t.\u0275fac=function(a){return new(a||t)(r(s))},t.\u0275prov=o({token:t,factory:t.\u0275fac});let i=t;return i})();export{m as a};

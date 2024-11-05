@@ -20,6 +20,7 @@ import { ServicosComponent } from './servicos.component';
 import { ServicosRoutingModule } from './servicos-routing.module';
 import { MockServicoService } from './services/mock-servico.service'; // Import MockServicoService
 import { MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   imports: [
@@ -40,7 +41,8 @@ import { MessageService } from 'primeng/api';
     ButtonModule, 
     DialogModule,
     FileUploadModule,
-    CheckboxModule
+    CheckboxModule,
+    ConfirmDialogModule 
   ],
   declarations: [ServicosComponent],
   providers: [MockServicoService, MessageService] // Provide MockServicoService and MessageService

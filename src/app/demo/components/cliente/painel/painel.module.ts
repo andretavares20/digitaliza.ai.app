@@ -18,6 +18,8 @@ import { PainelComponent } from './painel.component';
 import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { CheckboxModule } from 'primeng/checkbox';
+import { GalleriaModule } from 'primeng/galleria';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   imports: [
@@ -38,7 +40,9 @@ import { CheckboxModule } from 'primeng/checkbox';
     ButtonModule, 
     DialogModule,
     FileUploadModule,
-    CheckboxModule
+    CheckboxModule,
+    GalleriaModule,
+    ConfirmDialogModule
   ],
   declarations: [PainelComponent]
 })

@@ -1,107 +1,109 @@
 import { Component, OnInit } from '@angular/core';
+import { PedidoService } from '../novo-pedido/services/pedido.service';
+import { MessageService, ConfirmationService } from 'primeng/api';  // Adicione ConfirmationService
+import { saveAs } from 'file-saver';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-painel',
   templateUrl: './painel.component.html',
-  styleUrls: ['./painel.component.scss']
+  styleUrls: ['./painel.component.scss'],
+  providers: [ConfirmationService]  // Adicione ConfirmationService aos providers
 })
 export class PainelComponent implements OnInit {
   orders: any[] = [];
-  newOrderDialogVisible = false;
-  newOrder: any = {
-    files: [],
-    details: [],
-    observations: '',
-    value: 0,
-    orderDate: new Date(),
-    deliveryDate: null,
-    resultUrl: ''
-  };
-  services = [
-    { name: 'Upscale', value: 50, selected: false },
-    { name: 'Vetorização', value: 100, selected: false },
-    { name: 'Ajuste Fino', value: 75, selected: false }
+  displayCarousel: boolean = false; // Controle do carrossel
+  displayOrderDetails: boolean = false; // Controle do modal de detalhes
+  selectedOrder: any; // Pedido selecionado para ver os detalhes
+
+  carouselImages: any[] = [];
+
+  // Define as opções responsivas
+  responsiveOptions: any[] = [
+    {
+      breakpoint: '1024px',
+      numVisible: 5
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 3
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1
+    }
   ];
 
+  constructor(
+    private pedidoService: PedidoService, 
+    private messageService: MessageService, 
+    private authService: AuthService,
+    private confirmationService: ConfirmationService  // Injete ConfirmationService
+  ) {}
+
   ngOnInit() {
-    this.orders = [
-      {
-        fileName: 'imagem1.jpg',
-        status: 'Pendente',
-        details: ['Upscale', 'Vetorização', 'Ajuste Fino'],
-        paymentMethod: 'Cartão de Crédito',
-        value: 100,
-        orderDate: new Date('2024-07-01'),
-        deliveryDate: null,
-        resultUrl: 'assets/FRED1.jpeg'
-      },
-      {
-        fileName: 'imagem2.png',
-        status: 'Em andamento',
-        details: ['Vetorização'],
-        paymentMethod: 'Boleto',
-        value: 200,
-        orderDate: new Date('2024-07-02'),
-        deliveryDate: null,
-        resultUrl: 'assets/FRED2.jpeg'
-      },
-      {
-        fileName: 'imagem3.gif',
-        status: 'Concluído',
-        details: ['Ajuste Fino'],
-        paymentMethod: 'PayPal',
-        value: 150,
-        orderDate: new Date('2024-07-03'),
-        deliveryDate: new Date('2024-07-05'),
-        resultUrl: 'assets/FRED3.jpeg'
-      }
-    ];
+    this.loadOrders();
   }
 
-  showNewOrderDialog() {
-    this.newOrderDialogVisible = true;
-  }
-
-  onUpload(event: any) {
-    for (let file of event.files) {
-      this.newOrder.files.push(file);
+  loadOrders() {
+    const clienteId = this.authService.getUserId();  // Pegue o clienteId como string
+    if (clienteId) {
+      const clienteIdNumber = Number(clienteId);  // Converta a string para number
+      this.pedidoService.getOrdersByCliente(clienteIdNumber).subscribe(
+        data => {
+          this.orders = data;
+        },
+        error => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar pedidos.' });
+        }
+      );
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Cliente não autenticado.' });
     }
   }
 
-  calculateValue() {
-    this.newOrder.value = this.services
-      .filter(service => service.selected)
-      .reduce((acc, service) => acc + service.value, 0);
-  }
-
-  goToPayment() {
-    this.newOrderDialogVisible = false;
-    const selectedServices = this.services.filter(service => service.selected).map(service => service.name);
-    this.orders.push({
-      ...this.newOrder,
-      status: 'Pendente',
-      details: selectedServices,
-      orderDate: new Date(),
-      resultUrl: 'assets/new_order_placeholder.jpeg'
+  confirmDownloadResult(order: any) {
+    this.confirmationService.confirm({
+      message: `Deseja baixar o resultado do pedido ${order.id}?`,
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.downloadResult(order);
+      }
     });
-    // Redirecionar para a página de pagamento
-    // Aqui você pode adicionar lógica para redirecionar para uma tela de pagamento
-    this.newOrder = {
-      files: [],
-      details: [],
-      observations: '',
-      value: 0,
-      orderDate: new Date(),
-      deliveryDate: null,
-      resultUrl: ''
-    };
-    this.services.forEach(service => service.selected = false);
   }
 
   downloadResult(order: any) {
-    const link = document.createElement('a');
-    link.href = order.resultUrl;
-    link.download = order.fileName;
-    link.click();
+    this.pedidoService.downloadOrderResult(order.id).subscribe(
+      response => {
+        const blob = new Blob([response], { type: 'application/octet-stream' });
+        saveAs(blob, 'resultado_' + order.id + '.pdf');
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Resultado baixado com sucesso.' });
+      },
+      error => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao baixar o resultado do pedido.' });
+      }
+    );
+  }
+
+  openCarousel(order: any) {
+    this.carouselImages = order.files.map((file: any) => ({
+      previewImageSrc: file.fileUrl,
+      alt: file.fileName,
+      title: file.fileName
+    }));
+
+    this.displayCarousel = true;
+    document.body.classList.add('carousel-modal-open');
+  }
+
+  closeCarousel() {
+    this.displayCarousel = false;
+    document.body.classList.remove('carousel-modal-open');
+  }
+
+  openOrderDetails(order: any) {
+    this.selectedOrder = order;
+    this.displayOrderDetails = true;
   }
 }

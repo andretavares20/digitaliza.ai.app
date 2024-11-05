@@ -4,5 +4,45 @@
     object-fit: cover;
     border-radius: 8px;
     margin-right: 0.5rem;
-  }
-  
+    transition: transform 0.3s ease; /* Adiciona uma transição suave ao hover */
+}
+
+.thumbnail:hover {
+    transform: scale(1.05); /* Amplia levemente a imagem ao passar o mouse */
+}
+
+button:focus {
+    outline: 2px solid #007ad9; /* Azul, cor bem visível */
+    outline-offset: 2px; /* Dá um espaçamento entre o botão e o outline */
+    background-color: #e0f7ff; /* Muda a cor de fundo para uma cor mais clara no foco */
+    box-shadow: 0 0 5px rgba(0, 122, 217, 0.5); /* Adiciona um efeito de sombra */
+}
+
+/* Tornando o botão acessível também em hover */
+button:hover {
+    background-color: #007ad9;
+    color: white;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Overlay de Carregamento */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';  // Importar CommonModule ao invés de BrowserModule
 import { FormsModule } from '@angular/forms';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { InputTextModule } from 'primeng/inputtext';
 import { SidebarModule } from 'primeng/sidebar';
 import { BadgeModule } from 'primeng/badge';
@@ -18,7 +18,8 @@ import { AppConfigModule } from './config/config.module';
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppMenuitemComponent,
         AppTopBarComponent,
         AppFooterComponent,
@@ -26,9 +27,10 @@ import { AppLayoutComponent } from "./app.layout.component";
         AppSidebarComponent,
         AppLayoutComponent,
     ],
-    exports: [AppLayoutComponent], imports: [BrowserModule,
+    exports: [AppLayoutComponent], 
+    imports: [
+        CommonModule,  // Deve ser CommonModule
         FormsModule,
-        BrowserAnimationsModule,
         InputTextModule,
         SidebarModule,
         BadgeModule,
@@ -36,5 +38,8 @@ import { AppLayoutComponent } from "./app.layout.component";
         InputSwitchModule,
         RippleModule,
         RouterModule,
-        AppConfigModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+        AppConfigModule
+    ],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
 export class AppLayoutModule { }

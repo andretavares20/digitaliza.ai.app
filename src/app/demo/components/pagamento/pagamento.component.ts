@@ -1,5 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import axios from 'axios';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-pagamento',
@@ -14,7 +15,7 @@ export class PagamentoComponent implements AfterViewInit {
 
   async createCheckoutButton() {
     try {
-      const response = await axios.get('http://localhost:3000/create_preference');
+      const response = await axios.get(`${environment.apiUrl}/create_preference`);
       const preferenceId = response.data.preferenceId;
 
       const mp = new window['MercadoPago']('TEST-a45e1791-b190-4123-843b-7a4376e382bd');

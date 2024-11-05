@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { MockServicoService } from './services/mock-servico.service';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ServicoService } from './services/servico.service';
 
 @Component({
   selector: 'app-servicos',
   templateUrl: './servicos.component.html',
   styleUrls: ['./servicos.component.scss'],
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class ServicosComponent implements OnInit {
   servicos: any[] = [];
@@ -14,7 +14,11 @@ export class ServicosComponent implements OnInit {
   servico: any = {};
   submitted: boolean = false;
 
-  constructor(private servicoService: MockServicoService, private messageService: MessageService) { }
+  constructor(
+    private servicoService: ServicoService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
+  ) { }
 
   ngOnInit() {
     this.loadServicos();
@@ -23,6 +27,50 @@ export class ServicosComponent implements OnInit {
   loadServicos() {
     this.servicoService.getServicos().subscribe(data => {
       this.servicos = data;
+    });
+  }
+
+  confirmNewServico() {
+    this.confirmationService.confirm({
+      message: 'Deseja adicionar um novo serviço?',
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.openNew();
+      }
+    });
+  }
+
+  confirmEditServico(servico: any) {
+    this.confirmationService.confirm({
+      message: `Deseja editar o serviço ${servico.name}?`,
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.editServico(servico);
+      }
+    });
+  }
+
+  confirmDeleteServico(servico: any) {
+    this.confirmationService.confirm({
+      message: `Deseja excluir o serviço ${servico.name}?`,
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.deleteServico(servico);
+      }
+    });
+  }
+
+  confirmSaveServico() {
+    this.confirmationService.confirm({
+      message: this.servico.id ? `Deseja salvar as alterações no serviço ${this.servico.name}?` : 'Deseja salvar o novo serviço?',
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.saveServico();
+      }
     });
   }
 
@@ -55,7 +103,7 @@ export class ServicosComponent implements OnInit {
         });
       } else {
         this.servicoService.addServico(this.servico).subscribe(data => {
-          this.servicos = [...this.servicos, data]; // Atualize a lista de serviços aqui corretamente
+          this.servicos = [...this.servicos, data];
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Serviço adicionado com sucesso' });
         });
       }

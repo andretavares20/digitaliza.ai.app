@@ -1,4 +1,4 @@
-<div class="novo-pedido-container" >
+<div class="novo-pedido-container">
   <div class="overlay" *ngIf="isDragging">
     <div class="overlay-content">
       LARGUE A IMAGEM AQUI
@@ -31,7 +31,7 @@
           <span>{{fileObj.file.name}} - {{fileObj.file.size}} bytes</span>
           <button pButton icon="pi pi-times" class="remove-btn" (click)="removeFile(i)"></button>
           <div class="services">
-            <p-checkbox *ngFor="let servico of servicos" [(ngModel)]="fileObj.services[servico.name]" binary="true" [label]="servico.name" (onChange)="calculateValue()"></p-checkbox>
+            <p-checkbox *ngFor="let servico of servicos" [(ngModel)]="fileObj.services[servico.id]" binary="true" [label]="servico.name" (onChange)="calculateValue()"></p-checkbox>
           </div>
         </li>
       </ul>
@@ -55,11 +55,10 @@
   </div>
 </div>
 
-
-<p-dialog  header="Confirmação do Pedido" [(visible)]="orderSummaryDialog" [modal]="true" [style]="{width: '450px'}">
+<p-dialog header="Confirmação do Pedido" [(visible)]="orderSummaryDialog" [modal]="true" [style]="{width: '450px'}">
   <p-progressSpinner *ngIf="isLoading" [style]="{ 'width': '50px', 'height': '50px', 'position': 'fixed', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)' }" ariaLabel="loading"></p-progressSpinner>
 
-  <div [class.blurred]="isLoading" class="p-fluid" >
+  <div [class.blurred]="isLoading" class="p-fluid">
     <div class="p-field">
       <h4>Resumo do Pedido</h4>
       <p>Valor Total: {{ newOrder.value | currency:'BRL' }}</p>

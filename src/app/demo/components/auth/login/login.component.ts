@@ -80,9 +80,9 @@ export class LoginComponent implements AfterViewInit {
         this.messageService.add({severity: 'success', summary: 'Sucesso', detail: 'Login realizado com sucesso!'});
 
         // Redireciona com base no papel
-        setTimeout(() => {
-          this.authService.handleRoleRedirect();
-        }, 1500);  // Atraso para exibir a mensagem de sucesso antes de redirecionar
+        this.authService.handleRoleRedirect();
+        // setTimeout(() => {
+        // }, 1500);  // Atraso para exibir a mensagem de sucesso antes de redirecionar
       },
       (error) => {
         if (error.status === 403) {

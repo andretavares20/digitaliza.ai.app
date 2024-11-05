@@ -12,12 +12,13 @@ export class AppMenuComponent implements OnInit {
 
   constructor(
     public layoutService: LayoutService,
-    private authService: AuthService  // Adicione o AuthService
+    private authService: AuthService  // Adiciona o AuthService
   ) { }
 
   ngOnInit() {
-    const userRole = this.authService.getRole(); // Pega o papel do usuário
-    console.log('userole ',userRole)
+    const userRole = this.authService.getRole(); // Obtém o papel do usuário
+    console.log('userRole:', userRole); // Verifica se o papel está sendo corretamente obtido
+
     if (userRole === 'ROLE_ADMIN') {
       this.model = [
         {
@@ -47,6 +48,9 @@ export class AppMenuComponent implements OnInit {
           ]
         }
       ];
+    } else {
+      // Caso não haja papel definido, redirecionar para o login ou página de erro
+      this.authService.logout();
     }
   }
 }

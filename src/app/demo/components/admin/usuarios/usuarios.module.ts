@@ -18,6 +18,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { CheckboxModule } from 'primeng/checkbox';
 import { UsuariosComponent } from './usuarios.component';
 import { UsuariosRoutingModule } from './usuarios-routing.module';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import { UsuariosRoutingModule } from './usuarios-routing.module';
     ButtonModule, 
     DialogModule,
     FileUploadModule,
-    CheckboxModule
+    CheckboxModule,
+    ConfirmDialogModule
   ],
   declarations: [UsuariosComponent]
 })

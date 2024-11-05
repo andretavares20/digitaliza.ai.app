@@ -2,7 +2,8 @@
   <div class="col-12">
     <div class="card">
       <h5>Lista de Usuários</h5>
-      <p-table #dt [value]="usuarios" [paginator]="true" [rows]="10" [loading]="loading" [globalFilterFields]="['name', 'email', 'role', 'status']" responsiveLayout="scroll">
+      <p-table #dt [value]="usuarios" [paginator]="true" [rows]="10" [loading]="loading" 
+               [globalFilterFields]="['name', 'email', 'role', 'status']" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Limpar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
@@ -26,11 +27,16 @@
             <td>{{usuario.name}}</td>
             <td>{{usuario.email}}</td>
             <td>{{usuario.role}}</td>
-            <td>{{usuario.status}}</td>
+            <td *ngIf="usuario.active">ATIVO</td>
+            <td *ngIf="!usuario.active">INATIVO</td>
             <td>
               <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text" (click)="editUser(usuario)"></button>
-              <button pButton [icon]="getStatusButtonIcon(usuario)" [class]="getStatusButtonClass(usuario) + ' p-button-rounded p-button-text'" (click)="toggleUserStatus(usuario)"></button>
-              <button pButton [icon]="getRoleButtonIcon(usuario)" [class]="getRoleButtonClass(usuario) + ' p-button-rounded p-button-text'" (click)="changeUserRole(usuario)"></button>
+              
+              <button pButton [icon]="getStatusButtonIcon(usuario)" [class]="getStatusButtonClass(usuario) + ' p-button-rounded p-button-text'" 
+                      (click)="confirmStatusChange(usuario)"></button>
+              
+              <!-- <button pButton [icon]="getRoleButtonIcon(usuario)" [class]="getRoleButtonClass(usuario) + ' p-button-rounded p-button-text'" 
+                      (click)="confirmRoleChange(usuario)"></button> -->
             </td>
           </tr>
         </ng-template>
@@ -42,4 +48,15 @@
       </p-table>
     </div>
   </div>
+
+  <!-- Overlay de Carregamento -->
+  <div *ngIf="showLoading" class="overlay">
+    <div class="spinner-container">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <p>Aguarde enquanto processamos a ação...</p>
+    </div>
+  </div>
+
+  <!-- Diálogo de Confirmação -->
+  <p-confirmDialog></p-confirmDialog>
 </div>

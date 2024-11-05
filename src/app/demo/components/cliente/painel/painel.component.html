@@ -18,26 +18,31 @@
         <ng-template pTemplate="body" let-order>
           <tr>
             <td>
-              <img [src]="order.resultUrl" alt="{{ order.fileName }}" class="thumbnail">
+              <img 
+                *ngIf="order.files.length > 0" 
+                [src]="order.files[0]?.fileUrl" 
+                alt="{{ order.files[0]?.fileName }}" 
+                class="thumbnail"
+                (click)="openCarousel(order)" 
+                style="cursor: pointer;" />
             </td>
             <td>
               <span class="status-badge" [ngClass]="{
-                'status-pendente': order.status === 'Pendente',
-                'status-em-andamento': order.status === 'Em andamento',
-                'status-concluido': order.status === 'Concluído'
+                'status-pendente': order.status === 'PENDENTE',
+                'status-em-andamento': order.status === 'EM_ANDAMENTO',
+                'status-concluido': order.status === 'CONCLUIDO'
               }">{{ order.status }}</span>
             </td>
             <td>
-              <ul>
-                <li *ngFor="let detail of order.details">{{ detail }}</li>
-              </ul>
+              <button pButton type="button" label="Ver Detalhes" icon="pi pi-info-circle" (click)="openOrderDetails(order)"></button>
             </td>
             <td>{{ order.paymentMethod }}</td>
-            <td>{{ order.value | currency: 'BRL' }}</td>
+            <td>{{ order.totalValue | currency: 'BRL' }}</td>
             <td>{{ order.orderDate | date: 'dd/MM/yyyy' }}</td>
             <td>{{ order.deliveryDate ? (order.deliveryDate | date: 'dd/MM/yyyy') : 'Pendente' }}</td>
             <td>
-              <button pButton type="button" label="Baixar Resultado" icon="pi pi-download" (click)="downloadResult(order)"></button>
+              <button *ngIf="order.status === 'CONCLUIDO'" pButton type="button" label="Baixar Resultado" 
+        icon="pi pi-download" (click)="confirmDownloadResult(order)"></button>
             </td>
           </tr>
         </ng-template>
@@ -47,6 +52,35 @@
           </tr>
         </ng-template>
       </p-table>
+
+      <!-- Modal de Detalhes do Pedido -->
+      <p-dialog header="Detalhes do Pedido" [(visible)]="displayOrderDetails" [modal]="true" [dismissableMask]="true" [style]="{width: '600px'}">
+        <div *ngIf="selectedOrder">
+          <h5>Serviços solicitados:</h5>
+          <div *ngFor="let file of selectedOrder.files">
+            <h6>{{ file.fileName }}</h6>
+            <ul>
+              <li *ngFor="let service of file.services">{{ service.name }}</li>
+            </ul>
+          </div>
+        </div>
+      </p-dialog>
+
+      <!-- Carrossel de Imagens com Fundo Escuro -->
+      <div *ngIf="displayCarousel" class="carousel-overlay" (click)="closeCarousel()">
+        <div class="carousel-container" (click)="$event.stopPropagation()">
+          <p-galleria [(visible)]="displayCarousel" [value]="carouselImages" [showItemNavigators]="true" 
+            [showThumbnails]="true" [responsiveOptions]="responsiveOptions" 
+            [containerStyle]="{ 'max-width': '850px', 'max-height': '600px', 'overflow': 'hidden' }" 
+            [style]="{ 'width': '850px', 'height': '600px' }">
+            <ng-template pTemplate="item" let-image>
+              <img [src]="image.previewImageSrc" [alt]="image.alt" 
+                   style="width: 100%; height: 100%; object-fit: contain;">
+            </ng-template>
+          </p-galleria>
+        </div>
+      </div>
     </div>
   </div>
+  <p-confirmDialog></p-confirmDialog>
 </div>

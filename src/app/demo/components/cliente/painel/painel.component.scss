@@ -1,24 +1,52 @@
-.status-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  color: #fff;
+.carousel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-  &.status-pendente {
-    background-color: #f0ad4e;
-  }
+.carousel-container {
+  width: 850px; /* Largura fixa do carrossel */
+  height: 600px; /* Altura fixa do carrossel */
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1001;
+  overflow: hidden; /* Impede que o conteúdo saia dos limites do container */
+}
 
-  &.status-em-andamento {
-    background-color: #5bc0de;
-  }
+.carousel-container img {
+  max-width: 100%; /* Ajusta a imagem para caber dentro da largura do container */
+  max-height: 100%; /* Ajusta a imagem para caber dentro da altura do container */
+  object-fit: contain; /* Garante que a imagem mantenha sua proporção dentro do container */
+}
 
-  &.status-concluido {
-    background-color: #5cb85c;
-  }
+.p-galleria-item-next, 
+.p-galleria-item-prev {
+  z-index: 1002; /* Garante que as setas fiquem visíveis acima da imagem */
 }
 
 .thumbnail {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 0.25rem;
+  max-width: 100px;
+  max-height: 100px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.carousel-modal-open {
+  overflow: hidden; /* Previne o scroll na página enquanto o carrossel está aberto */
 }

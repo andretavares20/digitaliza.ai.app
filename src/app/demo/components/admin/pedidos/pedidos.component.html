@@ -1,71 +1,114 @@
 <div class="grid">
-    <div class="col-12">
-      <div class="card">
-        <h5>Gerenciamento de Pedidos</h5>
-        <p-table #dt [value]="pedidos" [paginator]="true" [rows]="10" [loading]="loading" [globalFilterFields]="['name', 'status', 'date', 'user', 'orderNumber']" responsiveLayout="scroll">
-          <ng-template pTemplate="caption">
-            <div class="flex justify-content-between flex-column sm:flex-row">
-              <button pButton label="Limpar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
-              <span class="p-input-icon-left mb-2">
-                <i class="pi pi-search"></i>
-                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." class="w-full" />
-              </span>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th pSortableColumn="orderNumber">Número do Pedido <p-sortIcon field="orderNumber"></p-sortIcon></th>
-              <th pSortableColumn="user">Usuário <p-sortIcon field="user"></p-sortIcon></th>
-              <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
-              <th pSortableColumn="date">Data <p-sortIcon field="date"></p-sortIcon></th>
-              <th>Ações</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-pedido>
-            <tr>
-              <td>{{pedido.orderNumber}}</td>
-              <td>{{pedido.user}}</td>
-              <td>
-                <p-dropdown [options]="statuses" [(ngModel)]="pedido.status" (onChange)="changeStatus(pedido, $event.value)">
-                </p-dropdown>
-              </td>
-              <td>{{pedido.date}}</td>
-              <td>
-                <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text" (click)="viewDetails(pedido)"></button>
-                <button pButton icon="pi pi-upload" class="p-button-rounded p-button-text" (click)="fileInput.click()"></button>
-                <input #fileInput type="file" (change)="importResults($event, pedido)" multiple style="display: none;">
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="6">Nenhum pedido encontrado.</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-    </div>
-  
-    <p-dialog header="Detalhes do Pedido" [(visible)]="displayDetails" [modal]="true" [style]="{width: '50vw'}" [closable]="false" appendTo="body">
-      <ng-template pTemplate="content">
-        <div *ngIf="selectedPedido">
-          <h3>{{selectedPedido.name}}</h3>
-          <p>Número do Pedido: {{selectedPedido.orderNumber}}</p>
-          <p>Usuário: {{selectedPedido.user}}</p>
-          <p>Status: {{selectedPedido.status}}</p>
-          <p>Data: {{selectedPedido.date}}</p>
-          <div *ngIf="selectedPedido.results && selectedPedido.results.length">
-            <h5>Resultados Importados:</h5>
-            <ul>
-              <li *ngFor="let result of selectedPedido.results">
-                <img [src]="result.objectURL" [alt]="result.name" class="thumbnail">
-                {{result.name}}
-              </li>
-            </ul>
+  <div class="col-12">
+    <div class="card">
+      <h5>Gerenciamento de Pedidos</h5>
+      <p-table #dt [value]="pedidos" [paginator]="true" [rows]="10" [loading]="loading" 
+               [globalFilterFields]="['orderNumber', 'userName', 'status', 'orderDate']" responsiveLayout="scroll">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Limpar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt)" 
+                    pTooltip="Limpar filtros" tooltipPosition="top" accesskey="l"></button>
+            <span class="p-input-icon-left mb-2">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." class="w-full" 
+                     aria-label="Pesquisar pedidos" accesskey="p"/>
+            </span>
           </div>
-          <button pButton label="Fechar" icon="pi pi-times" (click)="displayDetails = false"></button>
-        </div>
-      </ng-template>
-    </p-dialog>
+        </ng-template>
+
+        <!-- Cabeçalho da tabela -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="orderNumber">Número do Pedido <p-sortIcon field="orderNumber"></p-sortIcon></th>
+            <th pSortableColumn="userName">Usuário <p-sortIcon field="userName"></p-sortIcon></th>
+            <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+            <th pSortableColumn="orderDate">Data <p-sortIcon field="orderDate"></p-sortIcon></th>
+            <th>Ações</th>
+          </tr>
+        </ng-template>
+
+        <!-- Corpo da tabela -->
+        <ng-template pTemplate="body" let-pedido>
+          <tr>
+            <td>{{pedido.id}}</td>
+            <td>{{pedido.userName}}</td>
+            <td>{{pedido.status}}</td>
+            <td>{{pedido.orderDate | date:'dd/MM/yyyy'}}</td>
+            <td>
+              <!-- Botão de ver detalhes com tooltip e acessibilidade -->
+              <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewDetails(pedido)" pTooltip="Ver detalhes do pedido" aria-label="Ver detalhes"></button>
+
+              <!-- Botão de iniciar pedido com confirmação, tooltip e acessibilidade -->
+              <button pButton label="Iniciar" icon="pi pi-play" 
+                      class="p-button-rounded p-button-text" 
+                      (click)="confirmAction(pedido)" 
+                      *ngIf="pedido.status === 'PAGAMENTO_APROVADO'"
+                      pTooltip="Iniciar pedido" tooltipPosition="top" aria-label="Iniciar pedido">
+              </button>
+
+              <!-- Botão de importar resultados com confirmação, tooltip e acessibilidade -->
+              <button pButton icon="pi pi-upload" class="p-button-rounded p-button-text" 
+                      (click)="fileInput.click()" *ngIf="pedido.status === 'EM_ANDAMENTO'" 
+                      pTooltip="Importar resultados" aria-label="Importar resultados"></button>
+              <input #fileInput type="file" (change)="confirmImportResults($event, pedido)" multiple style="display: none;">
+
+              <!-- Botão de baixar arquivos do cliente -->
+              <button pButton icon="pi pi-download" class="p-button-rounded p-button-text" 
+                      (click)="downloadCustomerFiles(pedido)" 
+                      pTooltip="Baixar arquivos do cliente" aria-label="Baixar arquivos do cliente"></button>
+
+              <!-- Botão de baixar o resultado importado pelo admin (disponível após o pedido ser concluído) -->
+              <button pButton icon="pi pi-file" class="p-button-rounded p-button-text" 
+                      (click)="downloadResult(pedido)" *ngIf="pedido.status === 'CONCLUIDO'"
+                      pTooltip="Baixar resultado importado" aria-label="Baixar resultado importado"></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">Nenhum pedido encontrado.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
-  
+
+  <!-- Overlay de Carregamento -->
+  <div *ngIf="showLoading" class="loading-overlay">
+    <div class="spinner-container">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <p>Aguarde enquanto o pedido é concluído...</p>
+    </div>
+  </div>
+
+  <!-- Diálogo de detalhes do pedido -->
+  <p-dialog header="Detalhes do Pedido" [(visible)]="displayDetails" [modal]="true" 
+            [style]="{width: '50vw'}" [closable]="true" appendTo="body">
+    <ng-template pTemplate="content">
+      <div *ngIf="selectedPedido">
+        <h3>{{selectedPedido.name}}</h3>
+        <p>Número do Pedido: {{selectedPedido.id}}</p>
+        <p>Usuário: {{selectedPedido.userName}}</p>
+        <p>Status: {{selectedPedido.status}}</p>
+        <p>Data: {{selectedPedido.orderDate | date:'dd/MM/yyyy HH:mm:ss'}}</p>
+
+        <div *ngIf="selectedPedido.files && selectedPedido.files.length">
+          <h5>Arquivos Enviados:</h5>
+          <ul>
+            <li *ngFor="let file of selectedPedido.files">
+              <a [href]="file.fileUrl" target="_blank">{{file.fileName}}</a>
+              <ul>
+                <li *ngFor="let service of file.services">{{ service.name }}</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Diálogo de Confirmação -->
+  <p-confirmDialog></p-confirmDialog>
+</div>

@@ -18,6 +18,12 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { CheckboxModule } from 'primeng/checkbox';
 import { PedidosComponent } from './pedidos.component';
 import { PedidosRoutingModule } from './pedidos-routing.module';
+import { TooltipModule } from 'primeng/tooltip';  // Para tooltips (dicas de ferramentas)
+import { ToastModule } from 'primeng/toast';  // Para exibir toasts (mensagens de feedback)
+import { ConfirmDialogModule } from 'primeng/confirmdialog';  // Importação do módulo de confirmação
+
+
+
 
 @NgModule({
   imports: [
@@ -38,7 +44,10 @@ import { PedidosRoutingModule } from './pedidos-routing.module';
     ButtonModule, 
     DialogModule,
     FileUploadModule,
-    CheckboxModule
+    CheckboxModule,
+    TooltipModule,
+    ToastModule,
+    ConfirmDialogModule
   ],
   declarations: [PedidosComponent]
 })
