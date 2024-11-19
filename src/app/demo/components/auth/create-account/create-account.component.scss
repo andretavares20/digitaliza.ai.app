@@ -1,8 +1,24 @@
 .valid-field {
     border: 2px solid green;
-  }
-  
-  .invalid-field {
+}
+
+.invalid-field {
     border: 2px solid red;
-  }
-  
+}
+
+/* create-account.component.scss */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  z-index: 1000;
+}

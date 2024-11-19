@@ -5,7 +5,6 @@ import { MenusComponent } from './menus.component';
 import { PaymentComponent } from './payment.component';
 import { SeatComponent } from './seat.component';
 import { PersonalComponent } from './personal.component';
-import { ConfirmationComponent } from './confirmation.component';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MenubarModule } from 'primeng/menubar';
 import { TabMenuModule } from 'primeng/tabmenu';
@@ -36,7 +35,6 @@ import { InputTextModule } from 'primeng/inputtext';
 				path: '', component: MenusComponent, children: [
 					{ path: '', redirectTo: 'personal', pathMatch: 'full' },
 					{ path: 'personal', component: PersonalComponent },
-					{ path: 'confirmation', component: ConfirmationComponent },
 					{ path: 'seat', component: SeatComponent },
 					{ path: 'payment', component: PaymentComponent }
 				]

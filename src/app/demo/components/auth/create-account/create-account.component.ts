@@ -33,18 +33,20 @@ export class CreateAccountComponent {
     private messageService: MessageService
   ) { }
 
+  isLoading: boolean = false;
+
   createAccount() {
-    // Validações individuais
     this.validatePassword();
     this.validateEmail();
     this.validateTelephone();
     this.checkUsername();
 
-    // Verificação final se tudo está válido
     if (!this.isFormValid()) {
       this.showError("Erro", "Por favor, corrija os erros antes de continuar.");
       return;
     }
+
+    this.isLoading = true; // Ativa o loading
 
     const user = {
       name: this.name,
@@ -54,16 +56,18 @@ export class CreateAccountComponent {
       telephone: this.telephone
     };
 
-    this.userService.register(user).subscribe(
-      (response) => {
+    this.userService.register(user).subscribe({
+      next: (response) => {
+        this.isLoading = false; // Desativa o loading
         console.log('Account created successfully', response);
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(['/auth/confirmation'], { queryParams: { email: this.email } });
       },
-      (error) => {
+      error: (error) => {
+        this.isLoading = false; // Desativa o loading em caso de erro
         this.showError("Erro", "Erro ao criar a conta. Por favor, tente novamente.");
         console.error('Error creating account', error);
       }
-    );
+    });
   }
 
 

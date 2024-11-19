@@ -158,23 +158,32 @@ export class NovoPedidoComponent implements OnInit {
     this.orderSummaryDialog = true;
   }
 
+  mpButtonInstance: any;
+
   async createCheckoutButton() {
     try {
-      // Primeiro, cria a preferência de pagamento no Mercado Pago
+      // Verifique se o botão do Mercado Pago já foi criado e destrua-o
+      if (this.mpButtonInstance) {
+        this.mpButtonInstance.unmount();
+        this.mpButtonInstance = null;
+      }
+  
+      const walletContainer = document.getElementById("wallet_container");
+      if (walletContainer) {
+        walletContainer.innerHTML = ""; // Garante que o container está limpo
+      }
+  
+      // Código para criar a preferência de pagamento e o botão do Mercado Pago
       const preferenceResponse = await axios.get(`${environment.apiUrl}/mercadopago/create_preference`);
       this.preferenceId = preferenceResponse.data.preferenceId;
       const userId = this.authService.getUserId();
   
-      // Prepara os arquivos e outros detalhes do pedido para upload usando FormData
       const formData = new FormData();
-  
-      // Adiciona os detalhes do pedido diretamente como campos no FormData
       formData.append('totalValue', this.newOrder.value.toString());
       formData.append('couponCode', this.couponApplied ? this.couponCode : '');
       formData.append('preferenceId', this.preferenceId);
       formData.append('userId', userId.toString());
   
-      // Adiciona os arquivos e os serviços associados ao FormData
       const fileServices = this.newOrder.files.map((fileObj: any) => ({
         fileName: fileObj.file.name,
         services: Object.keys(fileObj.services).filter(serviceId => fileObj.services[serviceId])
@@ -186,17 +195,16 @@ export class NovoPedidoComponent implements OnInit {
         formData.append('files', fileObj.file, fileObj.file.name);
       });
   
-      // Envia os arquivos e os detalhes do pedido ao backend
       const orderResponse = await axios.post(`${environment.apiUrl}/mercadopago/create_order`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-  
-      console.log('Pedido criado:', orderResponse.data);
+
+      console.log('orderResponse: ',orderResponse)
   
       const mp = new window['MercadoPago']('TEST-a45e1791-b190-4123-843b-7a4376e382bd');
-      await mp.bricks().create("wallet", "wallet_container", {
+      this.mpButtonInstance = await mp.bricks().create("wallet", "wallet_container", {
         initialization: {
           preferenceId: this.preferenceId,
         },
@@ -207,7 +215,7 @@ export class NovoPedidoComponent implements OnInit {
         },
       });
   
-      await this.updatePreference();
+      await this.updatePreference(orderResponse.data);
   
       // Após o pagamento, verificar o status
       this.checkPaymentStatus();
@@ -218,6 +226,7 @@ export class NovoPedidoComponent implements OnInit {
       this.isLoading = false;
     }
   }
+
 
   async checkPaymentStatus() {
     try {
@@ -230,7 +239,7 @@ export class NovoPedidoComponent implements OnInit {
 
       this.messageService.add({
         severity: paymentStatus ? 'success' : 'error',
-        summary: paymentStatus ? 'Pagamento realizado com sucesso!' : 'Pagamento recusado!',
+        summary: paymentStatus ? 'Pedido gerado com sucesso!' : 'Pagamento recusado!',
         detail: paymentStatus ? 'Seu pedido foi gerado, prossiga para o pagamento.' : 'O pagamento foi recusado, tente novamente.',
       });
     } catch (error) {
@@ -243,11 +252,17 @@ export class NovoPedidoComponent implements OnInit {
     }
   }
 
-  async updatePreference() {
+  async updatePreference(orderResponse:any) {
     try {
+      console.log('newOrder: ',this.newOrder)
       await axios.post(`${environment.apiUrl}/mercadopago/update_preference`, {
         preferenceId: this.preferenceId,
-        totalValue: this.newOrder.value
+        totalValue: this.newOrder.value,
+        title: "title",
+        description: "description",
+        quantity: orderResponse.files.length,
+        payerName: orderResponse.payerName,
+        orderId: orderResponse.id
       });
     } catch (error) {
       console.error('Error updating preference:', error);

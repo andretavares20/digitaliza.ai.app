@@ -8,6 +8,7 @@ import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     PasswordModule,
     CheckboxModule,
     ToastModule,
+    CardModule
   ],
   providers: [provideNgxMask()],
   declarations: [],

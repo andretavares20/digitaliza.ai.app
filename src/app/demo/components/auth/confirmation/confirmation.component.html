@@ -1,0 +1,24 @@
+<div class="confirmation-container">
+    <p-card class="confirmation-card" header="Confirmação de Conta">
+        <p class="confirmation-instruction">
+            Insira o código de confirmação enviado para o seu email.
+        </p>
+
+        <div class="p-fluid">
+            <div class="p-field">
+                <label for="code">Código de Confirmação</label>
+                <input pInputText id="code" [(ngModel)]="code" placeholder="Digite o código de confirmação" />
+            </div>
+
+            <div class="p-field buttons">
+                <button pButton label="Confirmar Conta" icon="pi pi-check" (click)="confirmCode()" [disabled]="isLoading"></button>
+                <button pButton label="Reenviar Código" icon="pi pi-refresh" class="p-button-secondary" (click)="resendCode()" [disabled]="isLoading"></button>
+            </div>
+        </div>
+    </p-card>
+</div>
+
+<div *ngIf="isLoading" class="loading-overlay">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Carregando...</p> <!-- Adiciona texto de carregamento -->
+</div>

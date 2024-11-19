@@ -34,7 +34,7 @@ export class LoginComponent implements AfterViewInit {
     private router: Router,
     private authService: AuthService,
     private messageService: MessageService  // Serviço para mostrar mensagens
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     this.loadGoogleScript();
@@ -59,9 +59,22 @@ export class LoginComponent implements AfterViewInit {
   }
 
   handleCredentialResponse(response: any) {
-    const userInfo = this.decodeJwtResponse(response.credential);
-    this.authService.setSession(response.credential);  // Armazena o token JWT do Google
-    this.authService.handleRoleRedirect();  // Redireciona com base no papel
+    const idToken = response.credential;
+    console.log(1)
+    // Envia o ID token do Google para o back-end
+    this.authService.verifyOrCreateUserByIdToken(idToken).subscribe(
+      (token: string) => {
+        console.log(2)
+        this.authService.setSession(token);  // Armazena o token JWT retornado pelo back-end
+        console.log(3)
+        this.authService.handleRoleRedirect();  // Redireciona com base no papel do usuário
+        console.log(4)
+      },
+      (error) => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao fazer login com Google.' });
+        console.error('Erro no login com Google', error);
+      }
+    );
   }
 
   decodeJwtResponse(token: string): any {
@@ -73,11 +86,11 @@ export class LoginComponent implements AfterViewInit {
       email: this.email,
       password: this.password
     };
-  
+
     this.authService.login(credentials).subscribe(
       (response) => {
         this.authService.saveToken(response);  // Armazena o token JWT retornado pela API
-        this.messageService.add({severity: 'success', summary: 'Sucesso', detail: 'Login realizado com sucesso!'});
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Login realizado com sucesso!' });
 
         // Redireciona com base no papel
         this.authService.handleRoleRedirect();
@@ -85,10 +98,11 @@ export class LoginComponent implements AfterViewInit {
         // }, 1500);  // Atraso para exibir a mensagem de sucesso antes de redirecionar
       },
       (error) => {
+        console.log(error)
         if (error.status === 403) {
-          this.messageService.add({severity: 'error', summary: 'Erro', detail: 'Email ou senha inválidos.'});
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error });
         } else {
-          this.messageService.add({severity: 'error', summary: 'Erro', detail: 'Erro ao fazer login, tente novamente.'});
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao fazer login, tente novamente.' });
         }
       }
     );

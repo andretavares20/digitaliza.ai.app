@@ -56,4 +56,13 @@ export class UserService {
     const headers = this.getHeaders();
     return this.http.get<boolean>(`${this.clientUrl}/check-telephone?telephone=${telephone}`, { headers });
   }
+
+  confirmUser(email: string, code: string): Observable<any> {
+    return this.http.post(`${this.clientUrl}/confirm?email=${email}&code=${code}`, {}, { responseType: 'text' });
+  }
+
+
+  resendConfirmationCode(email: string): Observable<any> {
+    return this.http.post(`${this.clientUrl}/resend-code?email=${email}`, { },{ responseType: 'text' });
+  }
 }

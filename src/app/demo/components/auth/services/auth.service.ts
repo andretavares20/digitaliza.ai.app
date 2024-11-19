@@ -75,6 +75,7 @@ export class AuthService {
     this.currentUserId = null; // Reseta o userId durante o logout
     this.router.navigate(['/auth/login']);
   }
+  
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('authToken');
@@ -91,20 +92,13 @@ export class AuthService {
     if (userRole === 'ROLE_ADMIN') {
       this.router.navigate(['/admin/dashboard']);
     } else if (userRole === 'ROLE_USER') {
-      this.router.navigate(['/cliente/painel']);
+      this.router.navigate(['/cliente/novo-pedido']);
     }
   }
 
   // auth.service.ts
 
-  verifyOrCreateGoogleUser(googleToken: string): Observable<any> {
-    return this.http.post(`${this.clientUrl}/google-login`, { token: googleToken }, { responseType: 'text' }).pipe(
-      tap((response: any) => {
-        if (response) {
-          this.saveToken(response);  // Salva o token JWT retornado pela API
-        }
-      })
-    );
+  verifyOrCreateUserByIdToken(idToken: string): Observable<string> {
+    return this.http.post(`${this.clientUrl}/google-login`, { idToken }, { responseType: 'text' });
   }
-
 }
