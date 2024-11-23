@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   clientIdGoogle: '747224587241-dg0ni2i6mccdeb45jgtqr2u8jk9sqqvi.apps.googleusercontent.com',
+  publicKey: 'TEST-a45e1791-b190-4123-843b-7a4376e382bd',
   apiUrl: 'http://localhost:8080',
 };
 

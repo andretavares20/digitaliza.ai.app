@@ -18,7 +18,7 @@ export class PagamentoComponent implements AfterViewInit {
       const response = await axios.get(`${environment.apiUrl}/create_preference`);
       const preferenceId = response.data.preferenceId;
 
-      const mp = new window['MercadoPago']('TEST-a45e1791-b190-4123-843b-7a4376e382bd');
+      const mp = new window['MercadoPago']('APP_USR-1802293093399013-073020-35dc3c2ad278358c917c78fc117b9677-511926509');
       mp.bricks().create("wallet", "wallet_container", {
         initialization: {
           preferenceId: preferenceId,

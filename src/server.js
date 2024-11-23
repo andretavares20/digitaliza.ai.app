@@ -3,7 +3,7 @@ const mercadopago = require('mercadopago');
 const cors = require('cors');
 const app = express();
 
-mercadopago.configurations.setAccessToken('TEST-1802293093399013-073020-58d6f180c111cec266dbde7ffa2c1452-511926509');
+mercadopago.configurations.setAccessToken('APP_USR-1802293093399013-073020-35dc3c2ad278358c917c78fc117b9677-511926509');
 
 app.use(cors());
 
