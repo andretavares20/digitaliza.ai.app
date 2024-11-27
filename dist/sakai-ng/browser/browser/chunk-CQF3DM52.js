@@ -1,0 +1,1 @@
+import{M as o,P as e,Vb as n,u as r}from"./chunk-OQCQAMD7.js";var m=(()=>{let t=class t{constructor(i){this.http=i,this.apiUrl="assets/demo/data/icons.json"}getIcons(){return this.http.get(this.apiUrl).pipe(r(i=>(this.icons=i.icons,this.icons)))}};t.\u0275fac=function(a){return new(a||t)(e(n))},t.\u0275prov=o({token:t,factory:t.\u0275fac});let s=t;return s})();export{m as a};

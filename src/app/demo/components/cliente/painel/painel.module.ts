@@ -20,6 +20,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { CheckboxModule } from 'primeng/checkbox';
 import { GalleriaModule } from 'primeng/galleria';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   imports: [
@@ -42,7 +43,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     FileUploadModule,
     CheckboxModule,
     GalleriaModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    ToastModule
   ],
   declarations: [PainelComponent]
 })

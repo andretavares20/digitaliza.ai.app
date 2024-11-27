@@ -50,3 +50,10 @@
 body.carousel-modal-open {
   overflow: hidden; /* Previne o scroll na página enquanto o carrossel está aberto */
 }
+
+.wallet-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
